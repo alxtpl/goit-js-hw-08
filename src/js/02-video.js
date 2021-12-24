@@ -1,39 +1,38 @@
-// const throttle = require('lodash.throttle');
-// import throttle from 'lodash.throttle';
+import throttle from 'lodash.throttle';
+import Player from '@vimeo/player';
 
 const iframe = document.querySelector('iframe');
-const player = new Vimeo.Player(iframe);
+const player = new Player(iframe);
 
-player.on('timeupdate', onTime);
-document.addEventListener(
-    'scroll',
-    _.throttle(() => {
-        console.log('Scroll handler call every 300ms');
-    }, 300),
-);
-// var throttled = _.throttle(renewToken, 300000, { trailing: false });
-// jQuery(element).on('click', throttled);
+player.on('timeupdate', throttle(onTime, 1000));
 
-function onTime() {
-    // console.log('played the video!');
-    player
-        .getCurrentTime()
-        .then(function(seconds) {
-            // seconds = the current playback position
-            console.log(seconds);
-        })
-        .catch(function(error) {
-            // an error occurred
-        });
+const save = (key, value) => {
+    try {
+        const serializedState = JSON.stringify(value);
+        localStorage.setItem(key, serializedState);
+    } catch (error) {
+        console.error('Set state error: ', error.message);
+    }
+};
+
+const load = key => {
+    try {
+        const serializedState = localStorage.getItem(key);
+        return serializedState === null ? undefined : JSON.parse(serializedState);
+    } catch (error) {
+        console.error('Get state error: ', error.message);
+    }
+};
+
+export default {
+    save,
+    load,
+};
+
+///////////////////////////
+function onTime(data) {
+    save('videoplayer-current-time', data.seconds);
+    console.log(load('videoplayer-current-time'));
 }
 
-player.getVideoTitle().then(function(title) {
-    console.log('title:', title);
-});
-console.log(player);
-
-// {
-//   duration: 61.857;
-//   percent: 0.049;
-//   seconds: 3.034;
-// }
+player.setCurrentTime(load('videoplayer-current-time'));
