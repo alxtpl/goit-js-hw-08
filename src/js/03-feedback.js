@@ -63,7 +63,7 @@ inputFormNode.addEventListener('submit', onFormSubmit);
 function onFormSubmit(e) {
     e.preventDefault();
 
-    console.log('dataloadata', load('feedback-form-state', data));
+    console.table(load('feedback-form-state', data));
 
     localStorage.clear();
     inputFormNode.reset();
