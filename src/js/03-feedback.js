@@ -1,13 +1,70 @@
-const inputFormNode = document.querySelector('.feedback-form');
-inputFormNode.addEventListener('input', onFormSubmit);
-const data = {};
+import throttle from 'lodash.throttle';
 
-function onFormSubmit(e) {
+const inputFormNode = document.querySelector('.feedback-form');
+// inputFormNode.addEventListener('input', throttle(onFormSubmit, 500));
+inputFormNode.addEventListener('input', onFormFill);
+let data = {};
+
+//////////////////////////////////////////////////
+const save = (key, value) => {
+    try {
+        const serializedState = JSON.stringify(value);
+        localStorage.setItem(key, serializedState);
+    } catch (error) {
+        console.error('Set state error: ', error.message);
+    }
+};
+
+const load = key => {
+    try {
+        const serializedState = localStorage.getItem(key);
+        return serializedState === null ? undefined : JSON.parse(serializedState);
+    } catch (error) {
+        console.error('Get state error: ', error.message);
+    }
+};
+
+export default {
+    save,
+    load,
+};
+//////////////////////////////////////////////////
+let newData = {};
+
+function onFormFill(e) {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
 
-    formData.forEach((value, mail) => {
-        data[mail] = value;
-        console.log('data', data);
+    formData.forEach((value, name) => {
+        data[name] = value;
+        save('feedback-form-state', data);
+
+        // console.log('ndfill', newData);
     });
 }
+if (load('feedback-form-state', data) !== undefined) {
+    newData = load('feedback-form-state', data);
+} else return;
+
+function onFormLoad() {
+    if (newData !== undefined) {
+        inputFormNode.email.value = newData.email;
+        inputFormNode.message.value = newData.message;
+    } else {
+        inputFormNode.email.value = '';
+        inputFormNode.message.value = '';
+    }
+}
+inputFormNode.addEventListener('submit', onFormSubmit);
+
+function onFormSubmit(e) {
+    e.preventDefault();
+
+    console.log('newData', newData);
+
+    localStorage.clear();
+    inputFormNode.reset();
+    inputFormNode.children[2].disabled = true;
+}
+
+onFormLoad();
