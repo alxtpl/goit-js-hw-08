@@ -64,7 +64,7 @@ function onFormSubmit(e) {
 
     localStorage.clear();
     inputFormNode.reset();
-    inputFormNode.children[2].disabled = true;
+    // inputFormNode.children[2].disabled = true;
 }
 
 onFormLoad();
