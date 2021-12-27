@@ -42,11 +42,14 @@ function onFormFill(e) {
         // console.log('ndfill', newData);
     });
 }
-if (load('feedback-form-state', data) !== undefined) {
-    newData = load('feedback-form-state', data);
-} else return;
 
 function onFormLoad() {
+    if (load('feedback-form-state', data) !== undefined) {
+        newData = load('feedback-form-state', data);
+    } else {
+        newData.email = '';
+        newData.message = '';
+    }
     if (newData !== undefined) {
         inputFormNode.email.value = newData.email;
         inputFormNode.message.value = newData.message;
@@ -60,7 +63,7 @@ inputFormNode.addEventListener('submit', onFormSubmit);
 function onFormSubmit(e) {
     e.preventDefault();
 
-    console.log('newData', newData);
+    console.log('dataloadata', load('feedback-form-state', data));
 
     localStorage.clear();
     inputFormNode.reset();
